@@ -2,20 +2,25 @@ import uuid
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class CommandType(Enum):
-    EXECUTE = 1
-    STATUS = 2
+    RUN = 1
     KILL = 99
 
 
 class Command(BaseModel):
-    identifier: uuid.UUID
+    identifier: Optional[uuid.UUID] = None
     type: CommandType
     payload: Optional[str] = None
     arguments: Optional[List[str]] = None
+
+    @validator("identifier", pre=True, always=True)
+    def generate_identifier_uuid(cls, value):
+        if not value:
+            return uuid.uuid4()
+        return value
 
 
 class StatusType(Enum):
@@ -28,6 +33,12 @@ class StatusType(Enum):
 
 
 class Message(BaseModel):
-    identifier: uuid.UUID
+    identifier: Optional[uuid.UUID] = None
     status: StatusType
     result: Optional[bytes] = None
+
+    @validator("identifier", pre=True, always=True)
+    def generate_identifier_uuid(cls, value):
+        if not value:
+            return uuid.uuid4()
+        return value

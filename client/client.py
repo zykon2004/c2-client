@@ -1,37 +1,38 @@
 import base64
-import logging
 import os
 from multiprocessing import Process, Queue
-from typing import List
+from typing import Iterable
 
 import uvicorn
 from beacon import beacon
 from fastapi import FastAPI
-from logger import LOGGING_CONFIG, setup_logger
-from quit import quit_app
-from schema import Command, Message, StatusType
+from logger import LOGGING_CONFIG, keyboard_interrupt_handler, setup_logger
+from schema import Command, CommandType, Message, StatusType
 from settings import BEACON_INTERVAL_SECONDS, REMOTE_SERVER
+from tasks import quit_app, run_command
 
 
-# @keyboard_interrupt_handler
-def command_processor(queue: Queue, pids_to_kill: List[int]) -> None:
+@keyboard_interrupt_handler
+def command_processor(queue: Queue, pids_to_kill: Iterable[int]) -> None:
     while True:
         command = queue.get()
-        logging.debug(command)
-        if command == "exit":
-            pids_to_kill.append(os.getpid())
-            quit_app(pids_to_kill)
-        # Replace this with your actual command execution logic
-        logging.info(f"Running command: {command}")
+        if command.type == CommandType.RUN:
+            run_command(command)
+
+        if command.type == CommandType.KILL:
+            current_process_pid = os.getpid()
+            # if current_process_pid is first then it would kill
+            # himself first and skip the rest
+            quit_app((*pids_to_kill, current_process_pid))
 
 
 def create_listener(command_queue: Queue) -> FastAPI:
     app = FastAPI()
 
-    @app.post("/run_command")
-    async def run_command(command: str):
+    @app.post("/run_command", response_model=Message)
+    async def run_command(command: Command):
         command_queue.put(command)
-        return {"message": f"Command '{command}' added to the queue."}
+        return Message(identifier=command.identifier, status=StatusType.RECEIVED)
 
     @app.post("/is_up", response_model=Message)
     async def is_up(command: Command) -> Message:
@@ -44,7 +45,8 @@ def create_listener(command_queue: Queue) -> FastAPI:
 
     @app.post("/", response_model=None)
     async def get_beacon(msg: Message) -> None:
-        print(msg)
+        # print(msg)
+        ...
 
     return app
 
@@ -58,10 +60,11 @@ if __name__ == "__main__":
     beacon_process.start()
 
     command_queue: Queue = Queue()
+    main_process_pid = os.getpid()
     command_executer = Process(
         target=command_processor,
         kwargs=dict(
-            queue=command_queue, pids_to_kill=[os.getpid(), beacon_process.pid]
+            queue=command_queue, pids_to_kill=[main_process_pid, beacon_process.pid]
         ),
     )
     command_executer.start()
