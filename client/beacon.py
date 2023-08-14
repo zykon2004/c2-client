@@ -2,10 +2,12 @@ import uuid
 from time import sleep
 
 import requests
+from logger import keyboard_interrupt_handler
 from schema import Message, StatusType
 from settings import BEACON_INTERVAL_SECONDS, REMOTE_SERVER
 
 
+@keyboard_interrupt_handler
 def beacon(server: str, interval: int):
     while True:
         headers = {"Content-type": "application/json"}

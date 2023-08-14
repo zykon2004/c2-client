@@ -15,7 +15,8 @@ test:
 
 update-pre-commit:
 	pre-commit autoupdate && pre-commit run --all-files && git commit -am 'updated linters / formatters'
-
+pc:
+	pre-commit run -a
 build:
 	# build container
 	docker build -t deploy-fastapi .

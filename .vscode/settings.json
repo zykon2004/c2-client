@@ -14,7 +14,7 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.typeCheckingMode": "basic",
     "workbench.colorCustomizations": {
         "editor.background": "#11111A"
     },
