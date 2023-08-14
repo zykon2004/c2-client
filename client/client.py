@@ -12,7 +12,7 @@ from tasks import quit_app, run_command
 
 
 @keyboard_interrupt_handler
-def command_processor(queue: Queue, pids_to_kill: Iterable[int]) -> None:
+def command_processor(queue: Queue, pids_to_kill_on_quit: Iterable[int]) -> None:
     while True:
         command = queue.get()
         if command.type == CommandType.RUN:
@@ -22,7 +22,7 @@ def command_processor(queue: Queue, pids_to_kill: Iterable[int]) -> None:
             current_process_pid = os.getpid()
             # if current_process_pid is first then it would kill
             # himself first and skip the rest
-            quit_app((*pids_to_kill, current_process_pid))
+            quit_app((*pids_to_kill_on_quit, current_process_pid))
 
 
 def create_listener(command_queue: Queue) -> FastAPI:
@@ -54,7 +54,8 @@ if __name__ == "__main__":
     command_executer = Process(
         target=command_processor,
         kwargs=dict(
-            queue=command_queue, pids_to_kill=[main_process_pid, beacon_process.pid]
+            queue=command_queue,
+            pids_to_kill_on_quit=[main_process_pid, beacon_process.pid],
         ),
     )
     command_executer.start()
