@@ -1,4 +1,3 @@
-import base64
 import os
 from multiprocessing import Process, Queue
 from typing import Iterable
@@ -33,15 +32,6 @@ def create_listener(command_queue: Queue) -> FastAPI:
     async def run_command(command: Command):
         command_queue.put(command)
         return Message(identifier=command.identifier, status=StatusType.RECEIVED)
-
-    @app.post("/is_up", response_model=Message)
-    async def is_up(command: Command) -> Message:
-        # Need to check that it the identifier is not in the que
-        return Message(
-            identifier=command.identifier,
-            status=StatusType.BEACON,
-            result=base64.encodebytes(b"Hello"),
-        )
 
     @app.post("/", response_model=None)
     async def get_beacon(msg: Message) -> None:
