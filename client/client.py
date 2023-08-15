@@ -8,6 +8,7 @@ from heartbeat import heartbeat
 from logger import LOGGING_CONFIG, keyboard_interrupt_handler, setup_logger
 from schema import Command, CommandType, Message, StatusType
 from settings import (
+    CLIENT_PORT,
     HEARTBEAT_INTERVAL_SECONDS,
     REMOTE_SERVER,
     SECRET_KEY,
@@ -80,7 +81,7 @@ if __name__ == "__main__":
     uvicorn.run(
         create_listener(command_queue),
         host="0.0.0.0",  # noqa: S104
-        port=8080,
+        port=CLIENT_PORT,
         log_config=LOGGING_CONFIG,
         # ssl_keyfile=str(Path("../keys/key.pem")),
         # ssl_certfile=Path("../keys/cert.pem"),
