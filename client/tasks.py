@@ -17,6 +17,7 @@ def quit_app(pids_to_kill: Iterable[int]) -> None:
 
 
 def run_command(command: Command) -> Tuple[bytes, bytes]:
+    logging.debug("Received Command: %s", command)
     if not command.payload:
         raise ValueError(f"Missing payload for command {command.identifier}")
 

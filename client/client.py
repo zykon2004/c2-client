@@ -3,11 +3,11 @@ from multiprocessing import Process, Queue
 from typing import Iterable
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from heartbeat import heartbeat
 from logger import LOGGING_CONFIG, keyboard_interrupt_handler, setup_logger
 from schema import Command, CommandType, Message, StatusType
-from settings import HEARTBEAT_INTERVAL_SECONDS, REMOTE_SERVER
+from settings import HEARTBEAT_INTERVAL_SECONDS, REMOTE_SERVER, SECRET_KEY
 from tasks import quit_app, run_command
 
 
@@ -30,8 +30,11 @@ def create_listener(command_queue: Queue) -> FastAPI:
 
     @app.post("/run_command", response_model=Message)
     async def run_command(command: Command):
-        command_queue.put(command)
-        return Message(identifier=command.identifier, status=StatusType.RECEIVED)
+        if command.validate_signature(SECRET_KEY):
+            command_queue.put(command)
+            return Message(identifier=command.identifier, status=StatusType.RECEIVED)
+        else:
+            raise HTTPException(status_code=401, detail="Invalid signature")
 
     @app.post("/", response_model=None)
     async def get_heartbeat(msg: Message) -> None:
