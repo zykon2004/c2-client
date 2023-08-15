@@ -7,7 +7,11 @@ from fastapi import FastAPI, HTTPException
 from heartbeat import heartbeat
 from logger import LOGGING_CONFIG, keyboard_interrupt_handler, setup_logger
 from schema import Command, CommandType, Message, StatusType
-from settings import HEARTBEAT_INTERVAL_SECONDS, REMOTE_SERVER, SECRET_KEY
+from settings import (
+    HEARTBEAT_INTERVAL_SECONDS,
+    REMOTE_SERVER,
+    SECRET_KEY,
+)
 from tasks import quit_app, run_command
 
 
@@ -31,6 +35,17 @@ def create_listener(command_queue: Queue) -> FastAPI:
     @app.post("/run_command", response_model=Message)
     async def run_command(command: Command):
         if command.validate_signature(SECRET_KEY):
+
+            # It seems that this way is used to communicate between processes
+            # I have decided not to continue implementing it and sticking to using Queue
+            # file_path = Path(PAYLOAD_DIRECTORY) / str(command.identifier) / ".json"
+            # with open(file_path, 'w') as json_file:
+            #     json.dump(
+            #         command.model_dump_json(include={"payload", "arguments"}),
+            #         json_file,
+            #     )
+            #     logging.info("Dumped %s", file_path)
+
             command_queue.put(command)
             return Message(identifier=command.identifier, status=StatusType.RECEIVED)
         else:
