@@ -74,7 +74,7 @@ def run_command(command: Command) -> Tuple[bytes, bytes]:
 
 def send_message(message: Message, server: str = REMOTE_SERVER):
     headers = {"Content-type": "application/json"}
-    message_type = "beacon" if message.status == StatusType.BEACON else "message"
+    message_type = "heartbeat" if message.status == StatusType.HEARTBEAT else "message"
     try:
         response = requests.post(
             url=server,

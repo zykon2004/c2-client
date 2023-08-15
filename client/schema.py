@@ -24,7 +24,7 @@ class Command(BaseModel):
 
 
 class StatusType(Enum):
-    BEACON = 1
+    HEARTBEAT = 1
     RECEIVED = 2
     INITIALIZED = 3
     RUNNING = 4

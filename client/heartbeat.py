@@ -8,5 +8,5 @@ from tasks import send_message
 @keyboard_interrupt_handler
 def beacon(server: str, interval: int):
     while True:
-        send_message(Message(status=StatusType.BEACON), server=server)
+        send_message(Message(status=StatusType.HEARTBEAT), server=server)
         sleep(interval)

