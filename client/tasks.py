@@ -79,7 +79,7 @@ def send_message(message: Message, url: str = REMOTE_SERVER_BASE_URL):
     try:
         response = requests.post(
             url=url,
-            data=message.model_dump_json(),
+            data=message.model_dump_json(),  # type: ignore
             headers=headers,
             timeout=REQUEST_TIMEOUT,
         )
