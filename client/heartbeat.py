@@ -7,6 +7,7 @@ from time import sleep
 from client_id import get_client_identifier
 from logger import keyboard_interrupt_handler
 from schema import Message, StatusType
+from settings import CLIENT_PORT
 from tasks import send_message
 
 
@@ -15,7 +16,13 @@ def heartbeat(url: str, interval: int):
     client_id = get_client_identifier()
 
     base64_encoded_info = base64.b64encode(
-        json.dumps({"os": os.name, "hostname": socket.gethostname()}).encode("utf-8")
+        json.dumps(
+            {
+                "os": os.name,
+                "hostname": socket.gethostname(),
+                "port": CLIENT_PORT,
+            }
+        ).encode("utf-8")
     )
     while True:
         send_message(

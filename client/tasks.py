@@ -18,18 +18,19 @@ def quit_app(pids_to_kill: Iterable[int]) -> None:
 
 def run_command(command: Command) -> Tuple[bytes, bytes]:
     logging.debug("Received Command: %s", command)
+    command_payload = command.get_payload()
     if not command.payload:
         raise ValueError(f"Missing payload for command {command.identifier}")
 
     process_args = (
-        (command.payload,)
+        (command_payload,)
         if not command.arguments
-        else (command.payload, *command.arguments)
+        else (command_payload, *command.arguments)
     )
 
     try:
         logging.info(
-            "Executing Payload: %s with args: %s", command.payload, command.arguments
+            "Executing Payload: %s with args: %s", command_payload, command.arguments
         )
         send_message(
             Message(identifier=command.identifier, status=StatusType.INITIALIZED)
@@ -43,6 +44,8 @@ def run_command(command: Command) -> Tuple[bytes, bytes]:
 
         send_message(Message(identifier=command.identifier, status=StatusType.RUNNING))
         stdout, stderr = process.communicate()
+        logging.debug(stderr)
+        logging.debug(stdout)
 
         if stderr:
             send_message(

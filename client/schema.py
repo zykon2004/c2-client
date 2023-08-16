@@ -16,10 +16,31 @@ class CommandType(Enum):
     KILL = 99
 
 
-class Command(BaseModel):
+class BaseMessage(BaseModel):
     identifier: Optional[uuid.UUID] = None
+
+    @validator("identifier", pre=True, always=True)
+    def generate_identifier_uuid(cls, value):
+        if not value:
+            return uuid.uuid4()
+        return value
+
+    @staticmethod
+    def string_to_base64(string: Optional[str] = None) -> bytes:
+        if not string:
+            return base64.b64encode(b"")
+        return base64.b64encode(string.encode("utf-8"))
+
+    @staticmethod
+    def base64_to_string(bytes_obj: Optional[bytes] = None) -> str:
+        if not bytes_obj:
+            return ""
+        return base64.b64decode(bytes_obj).decode("utf-8")
+
+
+class Command(BaseMessage):
     type: CommandType
-    payload: Optional[str] = None
+    payload: Optional[bytes] = None
     arguments: Optional[List[str]] = None
     signature: Optional[bytes] = None
 
@@ -30,11 +51,12 @@ class Command(BaseModel):
     def __delattr__(self, *_, **__):
         raise ValueError("Fields cannot be deleted after initialization")
 
-    @validator("identifier", pre=True, always=True)
-    def generate_identifier_uuid(cls, value):
-        if not value:
-            return uuid.uuid4()
-        return value
+    @validator("payload", pre=True, always=True)
+    def validate_payload(cls, value):
+        return cls.string_to_base64(value)
+
+    def get_payload(self) -> str:
+        return self.base64_to_string(self.payload)
 
     @validator("signature", always=True)
     def sign_signature(cls, value, values: Dict[str, Any]):
@@ -68,13 +90,9 @@ class StatusType(Enum):
     ERROR = 6
 
 
-class Message(BaseModel):
-    identifier: Optional[uuid.UUID] = None
+class Message(BaseMessage):
     status: StatusType
     result: Optional[bytes] = None
 
-    @validator("identifier", pre=True, always=True)
-    def generate_identifier_uuid(cls, value):
-        if not value:
-            return uuid.uuid4()
-        return value
+    def get_result(self) -> str:
+        return self.base64_to_string(self.result)
