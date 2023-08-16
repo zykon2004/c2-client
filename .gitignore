@@ -134,3 +134,4 @@ dmypy.json
 /dump.rdb
 tools*
 keys*
+client_id.txt

@@ -49,7 +49,6 @@ class Command(BaseModel):
         return base64.b64encode(signature)
 
     def validate_signature(self, secret_key=SECRET_KEY) -> bool:
-
         received_signature = self.signature
         computed_signature = self.generate_signature(
             self.model_dump(exclude={"signature"}), secret_key

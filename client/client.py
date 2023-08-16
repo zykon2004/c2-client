@@ -36,7 +36,6 @@ def create_listener(command_queue: Queue) -> FastAPI:
     @app.post("/run_command", response_model=Message)
     async def run_command(command: Command):
         if command.validate_signature(SECRET_KEY):
-
             # It seems that this way is used to communicate between processes
             # I have decided not to continue implementing it and sticking to using Queue
             # file_path = Path(PAYLOAD_DIRECTORY) / str(command.identifier) / ".json"
