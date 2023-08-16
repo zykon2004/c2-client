@@ -23,7 +23,7 @@ class Command(BaseModel):
     arguments: Optional[List[str]] = None
     signature: Optional[bytes] = None
 
-    # Because that would
+    # Because that would break the signature
     def __setattr__(self, *_, **__):
         raise ValueError("Fields cannot be modified after initialization")
 
@@ -36,7 +36,7 @@ class Command(BaseModel):
             return uuid.uuid4()
         return value
 
-    @validator("signature", pre=True, always=True)
+    @validator("signature", always=True)
     def sign_signature(cls, value, values: Dict[str, Any]):
         if not value:
             return cls.generate_signature(values)
@@ -45,7 +45,7 @@ class Command(BaseModel):
     @staticmethod
     def generate_signature(values: Dict[str, Any], secret_key=SECRET_KEY):
         data = json.dumps(values, default=str).encode("utf-8")
-        signature = hmac.new(SECRET_KEY.encode("utf-8"), data, hashlib.sha256).digest()
+        signature = hmac.new(secret_key.encode("utf-8"), data, hashlib.sha256).digest()
         return base64.b64encode(signature)
 
     def validate_signature(self, secret_key=SECRET_KEY) -> bool:

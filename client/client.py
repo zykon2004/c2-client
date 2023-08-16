@@ -1,3 +1,4 @@
+import logging
 import os
 from multiprocessing import Process, Queue
 from typing import Iterable
@@ -49,6 +50,7 @@ def create_listener(command_queue: Queue) -> FastAPI:
             command_queue.put(command)
             return Message(identifier=command.identifier, status=StatusType.RECEIVED)
         else:
+            logging.error("Invalid signature for command: %s", command)
             raise HTTPException(status_code=401, detail="Invalid signature")
 
     @app.post("/", response_model=None)
@@ -63,7 +65,7 @@ if __name__ == "__main__":
     setup_logger("c2-client")
     heartbeat_process = Process(
         target=heartbeat,
-        kwargs=dict(server=REMOTE_SERVER_BASE_URL, interval=HEARTBEAT_INTERVAL_SECONDS),
+        kwargs=dict(url=REMOTE_SERVER_BASE_URL, interval=HEARTBEAT_INTERVAL_SECONDS),
     )
     heartbeat_process.start()
 
