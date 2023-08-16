@@ -51,10 +51,6 @@ class Command(BaseMessage):
     def __delattr__(self, *_, **__):
         raise ValueError("Fields cannot be deleted after initialization")
 
-    @validator("payload", pre=True, always=True)
-    def validate_payload(cls, value):
-        return cls.string_to_base64(value)
-
     def get_payload(self) -> str:
         return self.base64_to_string(self.payload)
 
