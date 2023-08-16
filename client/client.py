@@ -10,7 +10,7 @@ from schema import Command, CommandType, Message, StatusType
 from settings import (
     CLIENT_PORT,
     HEARTBEAT_INTERVAL_SECONDS,
-    REMOTE_SERVER,
+    REMOTE_SERVER_BASE_URL,
     SECRET_KEY,
 )
 from tasks import quit_app, run_command
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     setup_logger("c2-client")
     heartbeat_process = Process(
         target=heartbeat,
-        kwargs=dict(server=REMOTE_SERVER, interval=HEARTBEAT_INTERVAL_SECONDS),
+        kwargs=dict(server=REMOTE_SERVER_BASE_URL, interval=HEARTBEAT_INTERVAL_SECONDS),
     )
     heartbeat_process.start()
 

@@ -7,7 +7,7 @@ from typing import Iterable, Tuple
 
 import requests
 from schema import Command, Message, StatusType
-from settings import REMOTE_SERVER
+from settings import REMOTE_SERVER_BASE_URL, REQUEST_TIMEOUT
 
 
 def quit_app(pids_to_kill: Iterable[int]) -> None:
@@ -73,15 +73,15 @@ def run_command(command: Command) -> Tuple[bytes, bytes]:
         return b"", str(e).encode()
 
 
-def send_message(message: Message, server: str = REMOTE_SERVER):
+def send_message(message: Message, url: str = REMOTE_SERVER_BASE_URL):
     headers = {"Content-type": "application/json"}
     message_type = "heartbeat" if message.status == StatusType.HEARTBEAT else "message"
     try:
         response = requests.post(
-            url=server,
+            url=url,
             data=message.model_dump_json(),
             headers=headers,
-            timeout=1,
+            timeout=REQUEST_TIMEOUT,
         )
         if response.status_code == 200:  # noqa: PLR2004
             logging.info("Successfully sent %s", message)

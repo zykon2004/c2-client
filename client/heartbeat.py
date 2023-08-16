@@ -7,10 +7,10 @@ from tasks import send_message
 
 
 @keyboard_interrupt_handler
-def heartbeat(server: str, interval: int):
+def heartbeat(url: str, interval: int):
     client_id = get_client_identifier()
     while True:
         send_message(
-            Message(identifier=client_id, status=StatusType.HEARTBEAT), server=server
+            Message(identifier=client_id, status=StatusType.HEARTBEAT), url=url
         )
         sleep(interval)
