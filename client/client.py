@@ -34,7 +34,7 @@ def command_processor(queue: Queue, pids_to_kill_on_quit: Iterable[int]) -> None
 def create_listener(command_queue: Queue) -> FastAPI:
     app = FastAPI()
 
-    @app.post("/run_command", response_model=Message)
+    @app.post("/", response_model=Message)
     async def run_command(command: Command):
         if command.validate_signature(SECRET_KEY):
             # It seems that this way is used to communicate between processes
@@ -52,11 +52,6 @@ def create_listener(command_queue: Queue) -> FastAPI:
         else:
             logging.error("Invalid signature for command: %s", command)
             raise HTTPException(status_code=401, detail="Invalid signature")
-
-    @app.post("/", response_model=None)
-    async def get_heartbeat(msg: Message) -> None:
-        # print(msg)
-        ...
 
     return app
 
