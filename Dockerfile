@@ -5,6 +5,8 @@ COPY ./requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip && pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 COPY ./client /app
+COPY ./resources /app
+
 
 EXPOSE 8070-8090
 
