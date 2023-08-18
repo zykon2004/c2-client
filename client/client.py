@@ -11,6 +11,7 @@ from schema import Command, CommandType, Message, StatusType
 from settings import (
     CLIENT_PORT,
     HEARTBEAT_INTERVAL_SECONDS,
+    KEYS_PATH,
     REMOTE_SERVER_BASE_URL,
     SECRET_KEY,
 )
@@ -79,8 +80,8 @@ if __name__ == "__main__":
         host="0.0.0.0",  # noqa: S104
         port=CLIENT_PORT,
         log_config=LOGGING_CONFIG,
-        # ssl_keyfile=str(Path("../keys/key.pem")),
-        # ssl_certfile=Path("../keys/cert.pem"),
+        ssl_keyfile=str(KEYS_PATH / "key.pem"),
+        ssl_certfile=str(KEYS_PATH / "cert.pem"),
     )
     command_executer.join()
     heartbeat_process.join()

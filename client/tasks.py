@@ -6,8 +6,11 @@ import subprocess
 from typing import Iterable, Tuple
 
 import requests
+import urllib3
 from schema import Command, Message, StatusType
 from settings import REMOTE_SERVER_BASE_URL, REQUEST_TIMEOUT
+
+urllib3.disable_warnings()
 
 
 def quit_app(pids_to_kill: Iterable[int]) -> None:
@@ -85,6 +88,7 @@ def send_message(message: Message, url: str = REMOTE_SERVER_BASE_URL):
             data=message.model_dump_json(),  # type: ignore
             headers=headers,
             timeout=REQUEST_TIMEOUT,
+            verify=False,  # noqa: S501
         )
         if response.status_code == 200:  # noqa: PLR2004
             logging.info("Successfully sent %s", message)
