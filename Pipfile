@@ -4,12 +4,16 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-types-requests = "*"
 requests = "*"
 fastapi = "*"
 uvicorn = "*"
+python-decouple = "*"
 
 [dev-packages]
+ruff = "*"
+black = "*"
+pre-commit = "*"
+types-requests = "*"
 
 [requires]
 python_version = "3.11"

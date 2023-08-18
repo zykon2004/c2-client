@@ -1,13 +1,15 @@
 from typing import Literal
 
-PROTOCOL: Literal["http", "https"] = "http"
-REMOTE_SERVER_HOST = "localhost"
-REMOTE_SERVER_PORT = 8080
-REMOTE_SERVER_BASE_URL = f"{PROTOCOL}://{REMOTE_SERVER_HOST}:{REMOTE_SERVER_PORT}"
-# This should not be here
-SECRET_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY5MTk1ODg2OCwiaWF0IjoxNjkxOTU4ODY4fQ.mi9ar0R_mHsq1JCvdbEvwHz40fGVgZXIARefYJ9f4iU"  # noqa: S105
+from decouple import config
 
-HEARTBEAT_INTERVAL_SECONDS = 20
-REQUEST_TIMEOUT = 5
-# PAYLOAD_DIRECTORY = "payloads"
-CLIENT_PORT = 8070
+SECRET_KEY = config(
+    "SECRET_KEY", default="qonOUAf/wwonkxviM+P6uNBpoOjUpmoX88YHA+EwLkc="
+)
+PROTOCOL: Literal["http", "https"] = config("PROTOCOL", default="http")
+REMOTE_SERVER_HOST = config("REMOTE_SERVER_HOST", default="localhost")
+REMOTE_SERVER_PORT = config("REMOTE_SERVER_PORT", default=8080, cast=int)
+CLIENT_PORT = config("CLIENT_PORT", default=8070, cast=int)
+HEARTBEAT_INTERVAL_SECONDS = config("HEARTBEAT_INTERVAL_SECONDS", default=5, cast=int)
+REQUEST_TIMEOUT = config("REQUEST_TIMEOUT", default=5, cast=int)
+
+REMOTE_SERVER_BASE_URL = f"{PROTOCOL}://{REMOTE_SERVER_HOST}:{REMOTE_SERVER_PORT}"
