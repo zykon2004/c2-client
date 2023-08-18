@@ -7,8 +7,8 @@ SECRET_KEY = config(
 )
 PROTOCOL = config("PROTOCOL", default="https")
 REMOTE_SERVER_HOST = config("REMOTE_SERVER_HOST", default="localhost")
-REMOTE_SERVER_PORT = config("REMOTE_SERVER_PORT", default=8080, cast=int)
-CLIENT_PORT = config("CLIENT_PORT", default=8070, cast=int)
+REMOTE_SERVER_PORT = config("REMOTE_SERVER_PORT", default=7080, cast=int)
+CLIENT_PORT = config("CLIENT_PORT", default=7070, cast=int)
 HEARTBEAT_INTERVAL_SECONDS = config("HEARTBEAT_INTERVAL_SECONDS", default=5, cast=int)
 REQUEST_TIMEOUT = config("REQUEST_TIMEOUT", default=5, cast=int)
 
